@@ -48,15 +48,16 @@ public:
 	bool Intersect(Ray& ray) const
 	{
 		// --- PUT YOUR CODE HERE ---
+		bool objFound = false;
 
 		for(auto prim : m_vpPrims) {
 			if(prim.get()->Intersect(ray)) {
-				// ray.hit = prim;
-				return true;
+				ray.hit = prim;
+				objFound = true;
 			}
 		}
 
-		return false;
+		return objFound;
 	}
 
 	/**
@@ -75,8 +76,9 @@ public:
 	Vec3f RayTrace(Ray& ray) const
 	{
 		// --- PUT YOUR CODE HERE ---
-		if(Intersect(ray)) 
-			return RGB(1,1,1);
+		if(Intersect(ray)) {
+			return ray.hit.get()->getShader()->Shade(ray);
+		}
 
 		return RGB(0,0,0);
 	}
