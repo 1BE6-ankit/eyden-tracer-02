@@ -56,7 +56,11 @@ public:
 	virtual Vec3f GetNormal(const Ray& ray) const override
 	{
 		// --- PUT YOUR CODE HERE ---
-		return Vec3f();
+		
+		// get the intersected point on the sphere
+		Vec3f point = ray.org + ray.t * ray.dir;
+		
+		return normalize(point - m_center);
 	}
 	
 private:
