@@ -68,13 +68,27 @@ public:
 			specularSum += L_i * pow(-ray.dir.dot(R_v), m_ke);
 		}
 
-
 		Vec3f L_r(0, 0, 0);
 
 		for(int i=0; i<3; i++) {
 			L_r[i] = m_ka * m_ca[i] * L_a[i] +
 				m_kd * m_cd[i] * diffuseSum[i] + 
 				m_ks * m_cs[i] * specularSum[i];
+		}
+
+
+		float distToSurface;
+
+		for(auto l_source : m_scene.m_vpLights) {
+			// (void) l_source.get()->Illuminate(I_i);
+			L_i = (l_source.get()->Illuminate(I_i)).value();
+			distToSurface = I_i.t;
+
+			if(m_scene.Occluded(I_i) && 
+				I_i.hit.get() != ray.hit.get()) 
+			{
+				L_r = L_r /  max(min(distToSurface-I_i.t, 1.0f), 1.22f);
+			}
 		}
 
 		return L_r;

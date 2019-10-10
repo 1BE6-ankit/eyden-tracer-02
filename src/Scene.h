@@ -67,7 +67,14 @@ public:
 	bool Occluded(Ray& ray)
 	{
 		// --- PUT YOUR CODE HERE ---
-		return false;
+		CPrim* firstIntersect;
+		bool objFound = false;
+
+		if(Intersect(ray)) {
+			return true;
+		}
+
+		return objFound;
 	}
 
 	/**
