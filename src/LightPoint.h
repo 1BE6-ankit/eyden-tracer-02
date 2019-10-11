@@ -29,7 +29,6 @@ public:
 		return m_intensity / pow(norm(ray.org - m_position), 1);
 	}
 
-
 private:
 	Vec3f m_intensity; ///< emission (red, green, blue)
 	Vec3f m_position;  ///< The light source origin

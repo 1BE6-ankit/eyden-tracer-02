@@ -53,42 +53,39 @@ public:
 		Ray I_i;
 		I_i.org = ray.org + ray.t * ray.dir;
 
+		// number of rays that are taken in the light source
+		int div_count = 1000;
+
 		for(auto l_source : m_scene.m_vpLights) {
 			L_i = (l_source.get()->Illuminate(I_i)).value();
 
 			// addup all the light sources to add ambience
 			L_a += L_i;
-
 			R_v = -I_i.dir + 2 * I_i.dir.dot(m_Normal) * m_Normal;
 
 			dot_product = I_i.dir.dot(m_Normal);
-			if(dot_product > 0)
-				diffuseSum += L_i * dot_product;
+			if(dot_product > 0) {
+				for(int i=0; i<div_count; i++) {
+					(void) (l_source.get()->Illuminate(I_i)).value();
+					I_i.t = std::numeric_limits<float>::infinity();
+
+					if(!m_scene.Occluded(I_i)) {
+						if(I_i.hit.get() != ray.hit.get()) {
+							diffuseSum += L_i * dot_product;
+						}
+					}
+				}
+			}
 
 			specularSum += L_i * pow(-ray.dir.dot(R_v), m_ke);
 		}
 
+		diffuseSum /= div_count;
 		Vec3f L_r(0, 0, 0);
-
 		for(int i=0; i<3; i++) {
 			L_r[i] = m_ka * m_ca[i] * L_a[i] +
 				m_kd * m_cd[i] * diffuseSum[i] + 
 				m_ks * m_cs[i] * specularSum[i];
-		}
-
-
-		float distToSurface;
-
-		for(auto l_source : m_scene.m_vpLights) {
-			// (void) l_source.get()->Illuminate(I_i);
-			L_i = (l_source.get()->Illuminate(I_i)).value();
-			distToSurface = I_i.t;
-
-			if(m_scene.Occluded(I_i) && 
-				I_i.hit.get() != ray.hit.get()) 
-			{
-				L_r = L_r /  max(min(distToSurface-I_i.t, 1.0f), 1.22f);
-			}
 		}
 
 		return L_r;

@@ -27,13 +27,24 @@ public:
 	{ 
 		// --- PUT YOUR CODE HERE ---
 		m_normal = normalize(m_e1.cross(m_e2));
-		m_area = norm(m_e1.cross(m_e2));
+		m_area = 0.5 * norm(m_e1.cross(m_e2)) + 0.5 * norm((p1-p3).cross(p2-p3));
 	}  
 
 	virtual std::optional<Vec3f> Illuminate(Ray& ray) override
 	{
 		// --- PUT YOUR CODE HERE ---
-		return Vec3f();
+		float val_1, val_2;
+		val_1 = DirectGraphicalModels::random::U<float>(0,1);
+		val_2 = DirectGraphicalModels::random::U<float>(0,1);
+
+		Vec3f light_point = m_p0 + m_e1 * val_1 + m_p0 + m_e2 * val_2;
+
+		// --- PUT YOUR CODE HERE ---
+		ray.dir = normalize(ray.org - light_point);
+		ray.dir = -ray.dir;
+
+		ray.t = norm(ray.org - light_point);
+		return m_intensity / pow(norm(ray.t), 1);
 	}
 
 	Vec3f GetNormal(const Vec3f& position) const { return m_normal; }
@@ -41,9 +52,15 @@ public:
 
 private:
 	Vec3f m_intensity;
+
 	Vec3f m_p0;
+	Vec3f m_p1;
+	Vec3f m_p2;
+	Vec3f m_p3;
+
 	Vec3f m_e1;
 	Vec3f m_e2;
 	float m_area;
+
 	Vec3f m_normal;
 };
