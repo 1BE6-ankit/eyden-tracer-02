@@ -3,13 +3,14 @@
 #pragma once
 
 #include "types.h"
-#include "Prim.h"
+
+class CPrim;
 
 /// Basic ray structure
 struct Ray
 {
-	Vec3f					org;		///< Origin
-	Vec3f					dir;		///< Direction
-	float					t;			///< Current/maximum hit distance
-	std::shared_ptr<CPrim> 	hit;		///< Pointer to currently closest primitive
+	Vec3f		org;		///< Origin
+	Vec3f		dir;		///< Direction
+	float		t;		///< Current/maximum hit distance
+	const CPrim* 	hit;		///< Pointer to currently closest primitive
 };
