@@ -54,7 +54,7 @@ public:
 		I_i.org = ray.org + ray.t * ray.dir;
 
 		// number of rays that are taken in the light source
-		int div_count = 1000;
+		int div_count = 50;
 
 		for(auto l_source : m_scene.m_vpLights) {
 			L_i = (l_source.get()->Illuminate(I_i)).value();

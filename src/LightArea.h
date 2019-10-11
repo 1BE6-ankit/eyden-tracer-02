@@ -54,10 +54,6 @@ private:
 	Vec3f m_intensity;
 
 	Vec3f m_p0;
-	Vec3f m_p1;
-	Vec3f m_p2;
-	Vec3f m_p3;
-
 	Vec3f m_e1;
 	Vec3f m_e2;
 	float m_area;
