@@ -22,7 +22,19 @@ public:
 	virtual Vec3f Shade(const Ray& ray) const override
 	{
 		// --- PUT YOUR CODE HERE ---
-		return RGB(0, 0, 0);
+
+		// dot product formula:
+		// a.b = |a|.|b|.Cos(theta)
+
+		Vec3f normal = ray.hit.get()->GetNormal(ray);
+		float theta = (float) normal.dot(ray.dir) / (getMagnitude(normal) * getMagnitude(ray.dir)) ;
+		theta = abs(theta);
+
+		return CShaderFlat::Shade() * theta;
+	}
+
+	float getMagnitude(const Vec3f& vector) const {
+		return sqrt(pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2));
 	}
 };
 

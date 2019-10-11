@@ -29,7 +29,66 @@ public:
 	virtual Vec3f Shade(const Ray& ray) const override
 	{
 		// --- PUT YOUR CODE HERE ---
-		return RGB(0, 0, 0);
+
+		// specular color for white highlights
+		Vec3f m_cs = RGB(1, 1, 1);
+
+		// Flat color of the object
+		Vec3f m_cd = CShaderFlat::Shade(ray);
+
+		// ambient color (set it to the color of the object)
+		Vec3f m_ca = m_cd;
+
+		// Shading normal vector
+		Vec3f m_Normal = ray.hit.get()->GetNormal(ray);
+
+		Vec3f L_a(0, 0, 0);
+
+		Vec3f diffuseSum(0, 0, 0);
+		Vec3f specularSum(0, 0, 0);
+		Vec3f R_v, L_i;
+		float dot_product;
+
+		// direction from light source to surface point
+		Ray I_i;
+		I_i.org = ray.org + ray.t * ray.dir;
+
+		// number of rays that are taken in the light source
+		int div_count = 50;
+
+		for(auto l_source : m_scene.m_vpLights) {
+			L_i = (l_source.get()->Illuminate(I_i)).value();
+
+			// addup all the light sources to add ambience
+			L_a += L_i;
+			R_v = -I_i.dir + 2 * I_i.dir.dot(m_Normal) * m_Normal;
+
+			dot_product = I_i.dir.dot(m_Normal);
+			if(dot_product > 0) {
+				for(int i=0; i<div_count; i++) {
+					(void) (l_source.get()->Illuminate(I_i)).value();
+					I_i.t = std::numeric_limits<float>::infinity();
+
+					if(!m_scene.Occluded(I_i)) {
+						if(I_i.hit.get() != ray.hit.get()) {
+							diffuseSum += L_i * dot_product;
+						}
+					}
+				}
+			}
+
+			specularSum += L_i * pow(-ray.dir.dot(R_v), m_ke);
+		}
+
+		diffuseSum /= div_count;
+		Vec3f L_r(0, 0, 0);
+		for(int i=0; i<3; i++) {
+			L_r[i] = m_ka * m_ca[i] * L_a[i] +
+				m_kd * m_cd[i] * diffuseSum[i] + 
+				m_ks * m_cs[i] * specularSum[i];
+		}
+
+		return L_r;
 	}
 
 	
